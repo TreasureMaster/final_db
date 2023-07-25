@@ -1,16 +1,12 @@
 version: '3.7'
 
 services:
-  # postgres:
-  #   image: bitnami/postgresql:14
-  #   networks:
-  #     - dbase-network
 
   postgres:
     build:
       context: .
-    # image: "postgres-tutorials"
     # container_name: ${PG_CONTAINER_NAME}
+    hostname: postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -20,11 +16,25 @@ services:
        - db_booking:/data/postgres-booking
     ports:
       - 5432:5432
-    restart: unless-stopped
+    restart: always
+    networks:
+      - dbase-network
+
+  pgadmin:
+    image: dpage/pgadmin4:6
+    ports:
+      - 5051:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    depends_on:
+      - postgres
+    restart: always
+    networks:
+      - dbase-network
 
 volumes:
     db_booking:
-      external: true
 
 networks:
   dbase-network:
